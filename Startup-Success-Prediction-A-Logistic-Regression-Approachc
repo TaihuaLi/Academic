@@ -1,0 +1,560 @@
+company_train_data <- read.csv(file="CAX_Startup_Train.csv", header=TRUE, as.is=T)
+
+##########################################################################################################################################
+# Package requirements
+install.packages("plyr")
+install.packages("DMwR")
+install.packages("corrplot")
+install.packages("car")
+install.packages("pROc")
+install.packages("MASS")
+
+# Data Preprocessing
+# company_location (Base level: Other)
+library(plyr)
+company_train_data$company_location_USA <- ifelse(company_train_data$Company_Location=="USA", 1, 0)
+company_train_data$company_location_Europe <- ifelse(company_train_data$Company_Location=="Europe", 1, 0)
+
+# company_rasing_fund
+company_train_data$Company_raising_fund_Code <- ifelse(company_train_data$Company_raising_fund=="Yes", 1, 0)
+
+# Company_Industry_count (single = 1, few = 2, many = 3)
+company_train_data$Company_Industry_count_code <- as.numeric(revalue(company_train_data$Company_Industry_count,c("single"=1, "Few"=2, "Many"=3)))
+
+# Company_mobile_ app
+company_train_data$Company_mobile_app_code <- ifelse(company_train_data$Company_mobile_app=="Yes", 1, 0)
+
+# Company_top_Angel_vc_funding
+company_train_data$Company_investor_count_seed_code <- ifelse(company_train_data$Company_top_Angel_VC_funding=="Yes", 1, 0)
+
+# Founders_top_company_experience
+company_train_data$Founders_top_company_experience_code <- ifelse(company_train_data$Founders_top_company_experience=="Yes", 1, 0)
+
+# Founders_previous_company_employee_count (Small = 1, Medium = 2, Large = 3)
+company_train_data$Founders_previous_company_employee_count_code <- as.numeric(revalue(company_train_data$Founders_previous_company_employee_count,c("Small"=1, "Medium"=2, "Large"=3)))
+
+# Founders_startup_experience
+company_train_data$Founders_startup_experience_code <- ifelse(company_train_data$Founders_startup_experience=="Yes", 1, 0)
+
+# Founders_big_5_experience
+company_train_data$Founders_big_5_experience_code <- ifelse(company_train_data$Founders_big_5_experience=="Yes", 1, 0)
+
+# Company_Business_Model (Base level: Both)
+company_train_data$Company_business_model_B2B <- ifelse(company_train_data$Company_business_model=="B2B", 1, 0)
+company_train_data$Company_business_model_B2C <- ifelse(company_train_data$Company_business_model=="B2C", 1, 0)
+
+# Founders_experience (Low = 1, Medium = 2, High = 3)
+company_train_data$Founders_experience_code <- as.numeric(revalue(company_train_data$Founders_experience,c("Low"=1, "Medium"=2, "High"=3)))
+
+# Founders_global_exposure
+company_train_data$Founders_global_exposure_code <- ifelse(company_train_data$Founders_global_exposure=="Yes", 1, 0)
+
+# Founders_Industry_exposure (Low = 1, Medium = 2, High = 3)
+company_train_data$Founders_Industry_exposure_code <- as.numeric(revalue(company_train_data$Founders_Industry_exposure,c("Low"=1, "Medium"=2, "High"=3)))
+
+# Founders_education (base level: Bachelors)
+company_train_data$Founder_education_Masters <- ifelse(company_train_data$Founder_education=="Masters", 1, 0)
+company_train_data$Founder_education_PhD <- ifelse(company_train_data$Founder_education=="PhD", 1, 0)
+
+# Founders_profile_similarity (None = 0, Low = 1, Medium = 2, High = 3)
+company_train_data$Founders_profile_similarity_code <- as.numeric(revalue(company_train_data$Founders_profile_similarity,c("None"=0, "Low"=1, "Medium"=2, "High"=3)))
+
+# Founders_publications
+company_train_data$Founders_publications_code <- as.numeric(revalue(company_train_data$Founders_publications,c("None"=0, "Few"=1, "Many"=2)))
+
+# Company_incubation_investor
+company_train_data$Company_incubation_investor_code <- ifelse(company_train_data$Company_incubation_investor=="Yes", 1, 0)
+
+# company_crowdsourcing
+company_train_data$Company_crowdsourcing_code <- ifelse(company_train_data$Company_crowdsourcing=="Yes", 1, 0)
+
+# company_crowdfunding
+company_train_data$Company_crowdfunding_code <- ifelse(company_train_data$Company_crowdfunding=="Yes", 1, 0)
+
+# Company_big_data
+company_train_data$Company_big_data_code <- ifelse(company_train_data$Company_big_data=="Yes", 1, 0)
+
+# company_product_or_service (base level: Both)
+company_train_data$Company_Product_or_service_product <- ifelse(company_train_data$Company_Product_or_service=="Product", 1, 0)
+company_train_data$Company_Product_or_service_service <- ifelse(company_train_data$Company_Product_or_service=="Service", 1, 0)
+
+# Company_subscription_offering
+company_train_data$Company_subscription_offering_code <- ifelse(company_train_data$Company_subscription_offering=="Yes", 1, 0)
+
+# Founder_highest_degree_type (base level: Other)
+company_train_data$Founder_highest_degree_type_Management <- ifelse(company_train_data$Founder_highest_degree_type=="Management", 1, 0)
+company_train_data$Founder_highest_degree_type_Technology <- ifelse(company_train_data$Founder_highest_degree_type=="Technology", 1, 0)
+company_train_data$Founder_highest_degree_type_Science <- ifelse(company_train_data$Founder_highest_degree_type=="Science", 1, 0)
+
+# Company_difficulty_obtaining_workforce (Low = 1, Medium = 2, High = 3)
+company_train_data$Company_difficulty_obtaining_workforce_code <- as.numeric(revalue(company_train_data$Company_difficulty_obtaining_workforce,c("Low"=1, "Medium"=2, "High"=3)))
+
+# Company_Founder_Patent
+company_train_data$Company_Founder_Patent_code <- ifelse(company_train_data$Company_Founder_Patent=="Yes", 1, 0)
+
+# remove the original data
+company_train_data$Company_Location <- NULL
+company_train_data$Company_raising_fund <- NULL
+company_train_data$Company_Industry_count <- NULL
+company_train_data$Company_mobile_app <- NULL
+company_train_data$Company_top_Angel_VC_funding <- NULL
+company_train_data$Founders_top_company_experience <- NULL
+company_train_data$Founders_previous_company_employee_count <- NULL
+company_train_data$Founders_startup_experience <- NULL
+company_train_data$Founders_big_5_experience <- NULL
+company_train_data$Company_business_model <- NULL
+company_train_data$Founders_experience <- NULL
+company_train_data$Founders_global_exposure <- NULL
+company_train_data$Founders_Industry_exposure <- NULL
+company_train_data$Founder_education <- NULL
+company_train_data$Founders_profile_similarity <- NULL
+company_train_data$Founders_publications <- NULL
+company_train_data$Company_incubation_investor <- NULL
+company_train_data$Company_crowdsourcing <- NULL
+company_train_data$Company_crowdfunding <- NULL
+company_train_data$Company_big_data <- NULL
+company_train_data$Company_Product_or_service <- NULL
+company_train_data$Company_subscription_offering <- NULL
+company_train_data$Founder_highest_degree_type <- NULL
+company_train_data$Company_difficulty_obtaining_workforce <- NULL
+company_train_data$Company_Founder_Patent <- NULL
+
+# save and ignore CAX_ID
+CAX_ID <- company_train_data$CAX_ID
+company_train_data$CAX_ID <- NULL
+
+##########################################################################################################################################
+
+# outlier analysis
+library(DMwR)
+to_test <- company_train_data[,2:56]
+outlier.scores <- lofactor(to_test, k=5)
+plot(density(outlier.scores))
+# pick top 5 as outliers
+outliers <- order(outlier.scores, decreasing=T)[1:5]
+print(outliers)
+# 33 162 186 16 70
+
+##########################################################################################################################################
+
+# rename data columnsw
+column_names <- names(company_train_data)
+col_code <- seq(from=1, to=56)
+names(company_train_data) <- col_code
+
+# Data exploration
+
+# correlation analysis -> check for multicollinearity
+# plot correlations among variables
+library(corrplot)
+var_cor <- cor(company_train_data)
+
+# significance test for correlation coefficients
+cor.mtest <- function(mat, conf.level = 0.95) {
+  mat <- as.matrix(mat)
+  n <- ncol(mat)
+  p.mat <- lowCI.mat <- uppCI.mat <- matrix(NA, n, n)
+  diag(p.mat) <- 0
+  diag(lowCI.mat) <- diag(uppCI.mat) <- 1
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      tmp <- cor.test(mat[, i], mat[, j], conf.level = conf.level)
+      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+      lowCI.mat[i, j] <- lowCI.mat[j, i] <- tmp$conf.int[1]
+      uppCI.mat[i, j] <- uppCI.mat[j, i] <- tmp$conf.int[2]
+    }
+  }
+  return(list(p.mat, lowCI.mat, uppCI.mat))
+}
+
+var_res <- cor.mtest(var_cor, 0.95)
+corrplot.mixed(var_cor, lower="ellipse", upper="number", p.mat=var_res[[1]], sig.level=0.05, insig='blank')
+
+# correlation exists in the data set (criteria >0.7 or <-0.7)
+# Company_location_Europe & Company_location_USA: -0.844
+# Company_business_model_B2B & Company_business_model_B2C: -0.939
+# Company_big_data_code & Company_crowdfunding_code: 1
+# Company_Product_or_service_service & Company_Product_or_service_product: -0.872
+
+# change column names back
+names(company_train_data) <- column_names
+
+##########################################################################################################################################
+
+# model building
+
+# model 1
+# logistic regression: with all variables
+fit <- glm(Dependent~., data=company_train_data, family=binomial(logit))
+
+# AIC criteria
+library(car)
+null <- glm(Dependent~1, data=company_train_data, family=binomial(logit))
+full <- glm(Dependent~., data=company_train_data, family=binomial(logit))
+
+# forward selection
+reg <- step(null, scope=formula(full), direction="forward", k=log(234))
+# best model: Company_senior_team_count + Company_business_model_B2C + Company_crowdfunding_code + Company_raising_fund_Code
+
+# backward elimination
+reg <- step(full, direction="backward", k=log(234))
+# best model:Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code
+
+# stepwise
+reg <- step(full, direction="both", k=log(234))
+# best model: Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code
+
+fit <- glm(Dependent~Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code, data=company_train_data,family=binomial(logit))
+summary(fit)
+anova(fit, update(fit, ~1), test="Chisq")
+
+library(pROC)
+predpr <- predict(fit,type=c("response"))
+roccurve <- roc(company_train_data$Dependent ~ predpr)
+plot(roccurve, main="ROC Curve", sub="Model: Dependent~Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code")
+auc(roccurve)
+
+# model 2
+# logistic regression: without company_location_Europe, company_business_model_B2B, company_big_data_code & Company_Product_or_service_service
+company_train_data$company_location_Europe <- NULL
+company_train_data$Company_business_model_B2B <- NULL
+company_train_data$Company_big_data_code <- NULL
+company_train_data$Company_Product_or_service_service <- NULL
+
+null <- glm(Dependent~1, data=company_train_data, family=binomial(logit))
+full <- glm(Dependent~., data=company_train_data, family=binomial(logit))
+# forward selection
+reg <- step(null, scope=formula(full), direction="forward", k=log(234))
+# best model: Company_senior_team_count + Company_business_model_B2C +Company_crowdfunding_code + Company_raising_fund_Code
+# backward elimination
+reg <- step(full, direction="backward", k=log(234))
+# best_model: Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code
+# stepwise
+reg <- step(full, direction="both", k=log(234))
+# best_model: Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code
+fit <- glm(Dependent~Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code, data=company_train_data,family=binomial(logit))
+summary(fit)
+anova(fit, update(fit, ~1), test="Chisq")
+
+library(pROC)
+predpr <- predict(fit,type=c("response"))
+roccurve <- roc(company_train_data$Dependent ~ predpr)
+plot(roccurve)
+auc(roccurve)
+
+# model 3 (re-run the column-coding code)
+company_train_data$company_location_USA <- NULL
+company_train_data$Company_business_model_B2C <- NULL
+company_train_data$Company_crowdfunding_code <- NULL
+company_train_data$Company_Product_or_service_product <- NULL
+null <- glm(Dependent~1, data=company_train_data, family=binomial(logit))
+full <- glm(Dependent~., data=company_train_data, family=binomial(logit))
+# forward selection
+reg <- step(null, scope=formula(full), direction="forward", k=log(234))
+#best model: Company_senior_team_count + Company_business_model_B2B + Company_big_data_code + Company_raising_fund_Code
+# backward elimination
+reg <- step(full, direction="backward", k=log(234))
+# best model: Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B + Company_big_data_code
+# stepwise
+reg <- step(full, direction="both", k=log(234))
+# best model: Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B + Company_big_data_code
+fit <- glm(Dependent~Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B + Company_big_data_code, data=company_train_data,family=binomial(logit))
+summary(fit)
+anova(fit, update(fit, ~1), test="Chisq")
+
+library(pROC)
+predpr <- predict(fit,type=c("response"))
+roccurve <- roc(company_train_data$Dependent ~ predpr)
+plot(roccurve)
+auc(roccurve)
+# less than model 1 so we choose model 1 for further analysis
+
+##########################################################################################################################################
+
+# model validation and diagnosis - interaction effect
+# model: Dependeent ~ Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2C + Company_crowdfunding_code
+# we add B2B because it is associated with B2C business model and they are both needed when conclusions are drawn
+# new# model: Dependeent ~ Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B +Company_business_model_B2C 
+#             + Company_crowdfunding_code
+
+# contingency table
+dependent <- company_train_data$Dependent
+senior_count <- company_train_data$Company_senior_team_count
+raising_fund <- company_train_data$Company_raising_fund_Code
+B2C <- company_train_data$Company_business_model_B2C
+B2B <- company_train_data$Company_business_model_B2B
+crowdfunding <- company_train_data$Company_crowdfunding_code
+my_table <- data.frame(senior_count, raising_fund, B2C, B2B, crowdfunding, dependent)
+# print table
+ftable(my_table) # overall
+t.1 <- ftable(my_table[c("senior_count", "dependent")])
+t.2 <- ftable(my_table[c("raising_fund", "dependent")])
+t.3 <- ftable(my_table[c("B2C", "dependent")])
+t.4 <- ftable(my_table[c("B2B", "dependent")])
+
+# test of indepdence
+library(MASS)
+# mutual independence?
+my_table <- xtabs(~senior_count+raising_fund+B2C+B2B+crowdfunding+dependent)
+loglm(~senior_count+raising_fund+B2C+B2B+crowdfunding, my_table)
+# result: p-value = 0.56. they are not mutually independent
+
+# partial independent?
+loglm(~senior_count+raising_fund+B2C+B2B+crowdfunding+raising_fund*B2C, my_table)
+loglm(~senior_count+raising_fund+B2C+B2B+crowdfunding+raising_fund*B2B, my_table)
+loglm(~senior_count+raising_fund+B2C+B2B+crowdfunding+raising_fund*crowdfunding, my_table)
+loglm(~senior_count+raising_fund+B2C+B2B+crowdfunding+B2C*B2B, my_table)
+loglm(~senior_count+raising_fund+B2C+B2B+crowdfunding+B2C*crowdfunding, my_table)
+loglm(~senior_count+raising_fund+B2C+B2B+crowdfunding+B2B*crowdfunding, my_table)
+# result: all the p-values are around 0.55. there is no partial independence
+
+# conditional independence?
+loglm(~senior_count+raising_fund+ B2C+crowdfunding+senior_count*raising_fund+senior_count*B2C+senior_count*B2B+senior_count*crowdfunding, my_table)
+loglm(~senior_count+raising_fund+ B2C+crowdfunding+raising_fund*senior_count+raising_fund*B2C+raising_fund*B2B+raising_fund*crowdfunding, my_table)
+loglm(~senior_count+raising_fund+ B2C+crowdfunding+B2C*senior_count+B2C*raising_fund+B2C*B2B+B2C*crowdfunding, my_table)
+loglm(~senior_count+raising_fund+ B2C+crowdfunding+B2B*senior_count+B2B*raising_fund+B2B*B2C+B2B*crowdfunding, my_table)
+loglm(~senior_count+raising_fund+ B2C+crowdfunding+crowdfunding*senior_count+crowdfunding*raising_fund+crowdfunding*B2C+crowdfunding*B2B, my_table)
+# result: all the p-values are nearly 1. there is no conditional independence
+
+# interaction?
+loglm(~senior_count+raising_fund+B2B+B2C+crowdfunding+
+        senior_count*raising_fund+senior_count*B2C+senior_count*B2B+senior_count*crowdfunding+
+        raising_fund*B2B+raising_fund*B2C+raising_fund*crowdfunding+
+        B2B*B2C+B2B*crowdfunding+
+        B2C*crowdfunding, my_table)
+# result: p-value is 1, there is no five-way interation 
+
+# double check for interaction effect
+fit <- glm(dependent~enior_count+raising_fund+B2B+B2C+crowdfunding+
+             senior_count*raising_fund+senior_count*B2C+senior_count*B2B+senior_count*crowdfunding+
+             raising_fund*B2B+raising_fund*B2C+raising_fund*crowdfunding+
+             B2B*B2C+B2B*crowdfunding+
+             B2C*crowdfunding, family=binomial())
+summary(fit)
+
+# conclusion: no interaction terms besides these five terms
+
+##########################################################################################################################################
+
+# model validation and diagnosis - linearity, normal distribution of residuals, homoscedasticity, outliers, indepdencence of residuals
+# model: Dependeent ~ Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B +Company_business_model_B2C 
+#       + Company_crowdfunding_code
+
+fit <- glm(Dependent~Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B + 
+             Company_business_model_B2C + Company_crowdfunding_code, data=company_train_data,family=binomial(logit))
+
+summary(fit)
+anova(fit, update(fit, ~1), test="Chisq")
+
+library(pROC)
+predpr <- predict(fit,type=c("response"))
+roccurve <- roc(company_train_data$Dependent ~ predpr)
+plot(roccurve)
+auc(roccurve)
+
+op <- par(mfrow=c(2,2))
+op <- par(lwd=2, cex.main=1.3, cex.lab=1.3, cex.axis=1.3)
+plot(fit)
+par(op)
+
+# outliers
+library(DMwR)
+variables <- c("Company_senior_team_count", "Company_raising_fund_Code","Company_business_model_B2B",
+               "Company_business_model_B2C", "Company_crowdfunding_code")
+to_test <- company_train_data[,variables]
+outlier.scores <- lofactor(to_test, k=5)
+plot(density(outlier.scores))
+# pick top 5 as outliers
+outliers <- order(outlier.scores, decreasing=T)[1:5]
+print(outliers)
+# 1 4 33 38 51
+
+# omit outliers
+company_train_data <- company_train_data[-outliers[1:5],]
+
+# refit the model
+fit <- glm(Dependent~Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B + 
+             Company_business_model_B2C + Company_crowdfunding_code, data=company_train_data,family=binomial(logit))
+summary(fit)
+anova(fit, update(fit, ~1), test="Chisq")
+
+library(pROC)
+predpr <- predict(fit,type=c("response"))
+roccurve <- roc(company_train_data$Dependent ~ predpr)
+plot(roccurve)
+auc(roccurve)
+
+op <- par(mfrow=c(2,2))
+op <- par(lwd=2, cex.main=1.3, cex.lab=1.3, cex.axis=1.3)
+plot(fit)
+par(op)
+# since the ROC curve almost did not change, we decide to leave the detected outliers in the dataset
+
+##########################################################################################################################################
+
+# Confusion matrix, model alidation
+# note: rerun the data transformation code to include all the cases
+fit <- glm(Dependent~Company_senior_team_count + Company_raising_fund_Code + Company_business_model_B2B + 
+             Company_business_model_B2C + Company_crowdfunding_code, data=company_train_data,family=binomial(logit))
+predpr <- predict(fit,type=c("response"))
+actual <- company_train_data$Dependent
+comparison <- data.frame(actual, predpr)
+
+# cutoff: 0.5
+comparison$predicted <- ifelse(comparison$predpr >= 0.5, 1, 0)
+conf.matrix <- ftable(comparison[c("actual","predicted")])
+# result one
+#        predicted  0  1
+# actual                
+# 0                84 34
+# 1                36 80
+sensitivity <- 84/(84+34)
+specificity <- 80/(36+80)
+Y.J <- sensitivity+specificity-1 # 0.4015
+
+# cutoff: 0.6
+comparison$predicted <- ifelse(comparison$predpr >= 0.6, 1, 0)
+conf.matrix <- ftable(comparison[c("actual","predicted")])
+# result two
+#        predicted  0  1
+# actual                
+# 0                96 22
+# 1                48 68
+sensitivity <- 96/(96+22)
+specificity <- 68/(48+68)
+Y.J <- sensitivity+specificity-1 # 0.3998
+
+# cutoff: 0.4
+comparison$predicted <- ifelse(comparison$predpr >= 0.4, 1, 0)
+conf.matrix <- ftable(comparison[c("actual","predicted")])
+# result three
+#        predicted   0   1
+# actual                  
+# 0                 58  60
+# 1                 14 102
+sensitivity <- 60/(58+60)
+specificity <- 102/(14+102)
+Y.J <- sensitivity+specificity-1 # 0.38
+
+##########################################################################################################################################
+
+# predict on test set data
+
+company_test_data <- read.csv(file="CAX_Startup_Test.csv", head=TRUE, as.is=T)
+
+# transoform variables on the test data set
+library(plyr)
+company_test_data$company_location_USA <- ifelse(company_test_data$Company_Location=="USA", 1, 0)
+company_test_data$company_location_Europe <- ifelse(company_test_data$Company_Location=="Europe", 1, 0)
+
+# company_rasing_fund
+company_test_data$Company_raising_fund_Code <- ifelse(company_test_data$Company_raising_fund=="Yes", 1, 0)
+
+# Company_Industry_count (single = 1, few = 2, many = 3)
+company_test_data$Company_Industry_count_code <- as.numeric(revalue(company_test_data$Company_Industry_count,c("single"=1, "Few"=2, "Many"=3)))
+
+# Company_mobile_ app
+company_test_data$Company_mobile_app_code <- ifelse(company_test_data$Company_mobile_app=="Yes", 1, 0)
+
+# Company_top_Angel_vc_funding
+company_test_data$Company_investor_count_seed_code <- ifelse(company_test_data$Company_top_Angel_VC_funding=="Yes", 1, 0)
+
+# Founders_top_company_experience
+company_test_data$Founders_top_company_experience_code <- ifelse(company_test_data$Founders_top_company_experience=="Yes", 1, 0)
+
+# Founders_previous_company_employee_count (Small = 1, Medium = 2, Large = 3)
+company_test_data$Founders_previous_company_employee_count_code <- as.numeric(revalue(company_test_data$Founders_previous_company_employee_count,c("Small"=1, "Medium"=2, "Large"=3)))
+
+# Founders_startup_experience
+company_test_data$Founders_startup_experience_code <- ifelse(company_test_data$Founders_startup_experience=="Yes", 1, 0)
+
+# Founders_big_5_experience
+company_test_data$Founders_big_5_experience_code <- ifelse(company_test_data$Founders_big_5_experience=="Yes", 1, 0)
+
+# Company_Business_Model (Base level: Both)
+company_test_data$Company_business_model_B2B <- ifelse(company_test_data$Company_business_model=="B2B", 1, 0)
+company_test_data$Company_business_model_B2C <- ifelse(company_test_data$Company_business_model=="B2C", 1, 0)
+
+# Founders_experience (Low = 1, Medium = 2, High = 3)
+company_test_data$Founders_experience_code <- as.numeric(revalue(company_test_data$Founders_experience,c("Low"=1, "Medium"=2, "High"=3)))
+
+# Founders_global_exposure
+company_test_data$Founders_global_exposure_code <- ifelse(company_test_data$Founders_global_exposure=="Yes", 1, 0)
+
+# Founders_Industry_exposure (Low = 1, Medium = 2, High = 3)
+company_test_data$Founders_Industry_exposure_code <- as.numeric(revalue(company_test_data$Founders_Industry_exposure,c("Low"=1, "Medium"=2, "High"=3)))
+
+# Founders_education (base level: Bachelors)
+company_test_data$Founder_education_Masters <- ifelse(company_test_data$Founder_education=="Masters", 1, 0)
+company_test_data$Founder_education_PhD <- ifelse(company_test_data$Founder_education=="PhD", 1, 0)
+
+# Founders_profile_similarity (None = 0, Low = 1, Medium = 2, High = 3)
+company_test_data$Founders_profile_similarity_code <- as.numeric(revalue(company_test_data$Founders_profile_similarity,c("None"=0, "Low"=1, "Medium"=2, "High"=3)))
+
+# Founders_publications
+company_test_data$Founders_publications_code <- as.numeric(revalue(company_test_data$Founders_publications,c("None"=0, "Few"=1, "Many"=2)))
+
+# Company_incubation_investor
+company_test_data$Company_incubation_investor_code <- ifelse(company_test_data$Company_incubation_investor=="Yes", 1, 0)
+
+# company_crowdsourcing
+company_test_data$Company_crowdsourcing_code <- ifelse(company_test_data$Company_crowdsourcing=="Yes", 1, 0)
+
+# company_crowdfunding
+company_test_data$Company_crowdfunding_code <- ifelse(company_test_data$Company_crowdfunding=="Yes", 1, 0)
+
+# Company_big_data
+company_test_data$Company_big_data_code <- ifelse(company_test_data$Company_big_data=="Yes", 1, 0)
+
+# company_product_or_service (base level: Both)
+company_test_data$Company_Product_or_service_product <- ifelse(company_test_data$Company_Product_or_service=="Product", 1, 0)
+company_test_data$Company_Product_or_service_service <- ifelse(company_test_data$Company_Product_or_service=="Service", 1, 0)
+
+# Company_subscription_offering
+company_test_data$Company_subscription_offering_code <- ifelse(company_test_data$Company_subscription_offering=="Yes", 1, 0)
+
+# Founder_highest_degree_type (base level: Other)
+company_test_data$Founder_highest_degree_type_Management <- ifelse(company_test_data$Founder_highest_degree_type=="Management", 1, 0)
+company_test_data$Founder_highest_degree_type_Technology <- ifelse(company_test_data$Founder_highest_degree_type=="Technology", 1, 0)
+company_test_data$Founder_highest_degree_type_Science <- ifelse(company_test_data$Founder_highest_degree_type=="Science", 1, 0)
+
+# Company_difficulty_obtaining_workforce (Low = 1, Medium = 2, High = 3)
+company_test_data$Company_difficulty_obtaining_workforce_code <- as.numeric(revalue(company_test_data$Company_difficulty_obtaining_workforce,c("Low"=1, "Medium"=2, "High"=3)))
+
+# Company_Founder_Patent
+company_test_data$Company_Founder_Patent_code <- ifelse(company_test_data$Company_Founder_Patent=="Yes", 1, 0)
+
+# remove the original data
+company_test_data$Company_Location <- NULL
+company_test_data$Company_raising_fund <- NULL
+company_test_data$Company_Industry_count <- NULL
+company_test_data$Company_mobile_app <- NULL
+company_test_data$Company_top_Angel_VC_funding <- NULL
+company_test_data$Founders_top_company_experience <- NULL
+company_test_data$Founders_previous_company_employee_count <- NULL
+company_test_data$Founders_startup_experience <- NULL
+company_test_data$Founders_big_5_experience <- NULL
+company_test_data$Company_business_model <- NULL
+company_test_data$Founders_experience <- NULL
+company_test_data$Founders_global_exposure <- NULL
+company_test_data$Founders_Industry_exposure <- NULL
+company_test_data$Founder_education <- NULL
+company_test_data$Founders_profile_similarity <- NULL
+company_test_data$Founders_publications <- NULL
+company_test_data$Company_incubation_investor <- NULL
+company_test_data$Company_crowdsourcing <- NULL
+company_test_data$Company_crowdfunding <- NULL
+company_test_data$Company_big_data <- NULL
+company_test_data$Company_Product_or_service <- NULL
+company_test_data$Company_subscription_offering <- NULL
+company_test_data$Founder_highest_degree_type <- NULL
+company_test_data$Company_difficulty_obtaining_workforce <- NULL
+company_test_data$Company_Founder_Patent <- NULL
+
+# save and ignore CAX_ID
+CAX_ID <- company_test_data$CAX_ID
+company_test_data$CAX_ID <- NULL
+
+test <- predict(fit, newdata=company_test_data)
+prob <- exp(test) / (1 + exp(test))
+output <- ifelse(prob >= 0.5, 1, 0)
