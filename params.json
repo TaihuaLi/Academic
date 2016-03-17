@@ -1,0 +1,6 @@
+{
+  "name": "Academic Projects",
+  "tagline": "My graduate academic projects at DePaul University",
+  "body": "Here are the data information for each project:\r\n\r\n## Startup-Success-Prediction-A-Logistic-Regression-Approach\r\n- Data Source: [CrowdAnalytix](https://www.crowdanalytix.com/community)\r\n- Team members: Taihua Li, [Virginia Jiang](https://www.linkedin.com/in/virginia-jiang-50aa3935)\r\n- Project Presentation: Found in my [LinkedIn](https://www.linkedin.com/in/taihuali) project section \r\n\r\nNote: most of project code are written in [R](https://www.r-project.org) or [Python 3](https://www.python.org)\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
