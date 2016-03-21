@@ -1,5 +1,5 @@
 # My Academic Projects at DePaul University, Chicago, IL
-This is a depository for my graduate academic work and here are the data information for each project:
+This is a repository for my graduate academic work and here are the data information for each project:
 
 ## Startup-Success-Prediction-A-Logistic-Regression-Approach
 - Data Source: [CrowdAnalytix](https://www.crowdanalytix.com/community)
