@@ -1,5 +1,5 @@
-# My Academic Projects at DePaul University, Chicago, IL
-This is a repository for my graduate academic work and here are the data information for each project:
+# Logistic Regression Built for a Class
+This is a logistic regression which a student and I built to analyze the following data set:
 
 ## Startup-Success-Prediction-A-Logistic-Regression-Approach
 - Data Source: [CrowdAnalytix](https://www.crowdanalytix.com/community)
