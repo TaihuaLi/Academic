@@ -1,4 +1,5 @@
-# Logistic Regression Built for CSC 423 Data Analysis and Regression
+# Logistic Regression 
+## Built for CSC 423 Data Analysis and Regression
 This is a logistic regression which a student and I built to analyze the following data set:
 
 ## Startup-Success-Prediction-A-Logistic-Regression-Approach
